@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Assignment2</string>
+    <string name="action_settings">Settings</string>
+    <string name="descriptionHint">The To Do List will be expected to allow a user to create, read,
+update, and delete tasks. A task will have a name, a text field for content, a boolean field
+for whether it is completed, and an optional field for a due date and time.
+The To Do Application will co</string>
+</resources>

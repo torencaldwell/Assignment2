@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="edu.uark.csce.assignment2.todoActivity"
+    android:id="@+id/singleItem">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/topView"
+        android:layout_alignParentTop = "true">
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Done?"
+            android:id="@+id/doneBox"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="6dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Title"
+            android:textSize="20dp"
+            android:id="@+id/todoTitle"
+            android:layout_toLeftOf="@id/doneBox"
+            android:padding="5dp"
+            />
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:hint="@string/descriptionHint"
+        android:layout_below="@id/topView"
+        android:id="@+id/todoDescription"
+        android:padding="10dp"/>
+
+    <RelativeLayout
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/bottomView"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="5dp">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Submit"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:id="@+id/submitButton"
+            android:layout_marginRight="4dp"/>
+
+        <View android:background="#666666"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:layout_above="@id/submitButton"
+            android:id="@+id/lineBreak"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="10/06/17 11:59pm"
+            android:id="@+id/datetime"
+            android:textSize="20dp"
+            android:padding="10dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true" />
+    </RelativeLayout>
+
+
+
+
+</RelativeLayout>
