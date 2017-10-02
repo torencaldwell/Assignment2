@@ -20,7 +20,7 @@
             android:layout_alignParentEnd="true"
             android:layout_marginRight="6dp"/>
 
-        <TextView
+        <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Title"
@@ -31,9 +31,9 @@
             />
     </RelativeLayout>
 
-    <TextView
+    <EditText
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:hint="@string/descriptionHint"
         android:layout_below="@id/topView"
         android:id="@+id/todoDescription"
@@ -70,8 +70,10 @@
             android:id="@+id/datetime"
             android:textSize="20dp"
             android:padding="10dp"
+            android:layout_toLeftOf="@id/submitButton"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true" />
+            android:layout_alignParentStart="true"/>
+
     </RelativeLayout>
 
 
