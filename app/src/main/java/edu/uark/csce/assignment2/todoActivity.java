@@ -37,15 +37,14 @@ public class todoActivity extends AppCompatActivity{
         datetime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view){
-                DialogFragment newFragment = new TimePickerFragment();
-                newFragment.show(getFragmentManager(), "timePicker");
+                DialogFragment dateFragment = new DatePickerFragment();
+                dateFragment.show(getFragmentManager(), "datePicker");
             }
         });
     }
 
     @Override
     protected void onPause(){
-        Log.i("todoActivity", "end of activity");
         super.onPause();
         finish();
     }
