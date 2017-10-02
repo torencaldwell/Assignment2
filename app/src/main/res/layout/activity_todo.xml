@@ -24,7 +24,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Title"
-            android:textSize="20dp"
+            android:textSize="30dp"
             android:id="@+id/todoTitle"
             android:layout_toLeftOf="@id/doneBox"
             android:padding="5dp"
@@ -66,7 +66,8 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="10/06/17 11:59pm"
+            android:text="Set Reminder Time"
+            android:textColor="@color/colorAccent"
             android:id="@+id/datetime"
             android:textSize="20dp"
             android:padding="10dp"

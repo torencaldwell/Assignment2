@@ -21,10 +21,6 @@
         </activity>
         <activity android:name=".todoActivity" />
 
-        <service
-            android:name=".crudService"
-            android:enabled="true"
-            android:exported="true"></service>
     </application>
 
 </manifest>
