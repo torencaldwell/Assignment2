@@ -13,6 +13,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 public class ToDoProvider extends ContentProvider {
+    int SLEEP_TIME = 10;  //3 seconds to load (what is this, Dial-up?)
+
     //LOGTAG set to CLass Name
     private static String LOGTAG = "ToDoProvider:";
     // Database Name for SQLITE DB
@@ -28,14 +30,16 @@ public class ToDoProvider extends ContentProvider {
     //Column names for the ToDoList Table
     public static final String TODO_TABLE_COL_ID = "_ID";
     public static final String TODO_TABLE_COL_TITLE = "TITLE";
-    public static final String TODO_TABLE_COL_CONTENT = "CONTENT";
+    public static final String TODO_TABLE_COL_DESCRIPTION = "DESCRIPTION";
+    public static final String TODO_TABLE_COL_DATE = "DATE";
     //Table create string based on column names
     private static final String SQL_CREATE_MAIN = "CREATE TABLE " +
             TABLE_NAME+ " " +                       // Table's name
             "(" +                           // The columns in the table
             TODO_TABLE_COL_ID + " INTEGER PRIMARY KEY, " +
             TODO_TABLE_COL_TITLE + " TEXT," +
-            TODO_TABLE_COL_CONTENT + " TEXT)";
+            TODO_TABLE_COL_DESCRIPTION + " TEXT," +
+            TODO_TABLE_COL_DATE + " TEXT)";
 
     //URI Matcher object to facilitate switch cases between URIs
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -69,7 +73,7 @@ public class ToDoProvider extends ContentProvider {
                 TABLE_NAME,selection,selectionArgs);
         try {
             //Sleep for 3 seconds to emulate network latency
-            Thread.sleep(3000);
+            Thread.sleep(SLEEP_TIME);
         }
         catch (java.lang.InterruptedException myEx){
             Log.e(LOGTAG,myEx.toString());
@@ -104,7 +108,7 @@ public class ToDoProvider extends ContentProvider {
         long id = mOpenHelper.getWritableDatabase().insert(TABLE_NAME,null,values);
         try {
             //Sleep for 3 seconds to emulate network latency
-            Thread.sleep(3000);
+            Thread.sleep(SLEEP_TIME);
         }
         catch (java.lang.InterruptedException myEx){
             Log.e(LOGTAG,myEx.toString());
@@ -136,7 +140,7 @@ public class ToDoProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
-
+        Log.i("ToDoProvider", "Query recieved");
         //Use an SQLiteQueryBuilder object to create the query
         SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
         //Set the table to be queried
@@ -161,7 +165,7 @@ public class ToDoProvider extends ContentProvider {
                 selectionArgs,null,null,sortOrder);
         try {
             //Sleep for 3 seconds
-            Thread.sleep(3000);
+            Thread.sleep(SLEEP_TIME);
         }
         catch (java.lang.InterruptedException myEx){
             Log.e(LOGTAG,myEx.toString());
@@ -193,7 +197,7 @@ public class ToDoProvider extends ContentProvider {
                 selection,selectionArgs);
         try {
             //Sleep for 3 seconds
-            Thread.sleep(3000);
+            Thread.sleep(SLEEP_TIME);
         }
         catch (java.lang.InterruptedException myEx){
             Log.e(LOGTAG,myEx.toString());

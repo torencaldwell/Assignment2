@@ -21,6 +21,11 @@
         </activity>
         <activity android:name=".todoActivity" />
 
+        <provider
+            android:name=".ToDoProvider"
+            android:authorities="edu.uark.csce.assignment2.todoprovider"
+            android:enabled="true"
+            android:exported="true"></provider>
     </application>
 
 </manifest>

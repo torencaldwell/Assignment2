@@ -4,8 +4,11 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.TimePickerDialog;
+import android.content.ContentValues;
+import android.database.Cursor;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
+import android.net.Uri;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -26,10 +29,22 @@ public class todoActivity extends AppCompatActivity implements DatePickerDialog.
     TextView datetime, title, description;
     CheckBox checkBox;
 
+    Cursor mCursor;
+
+    ContentValues newValues;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_todo);
+
+        String[] mProjection = {ToDoProvider.TODO_TABLE_COL_TITLE, ToDoProvider.TODO_TABLE_COL_DESCRIPTION, ToDoProvider.TODO_TABLE_COL_DATE};
+        String mSelectionClause = null;
+        String[] mSelectionArgs = {""};
+
+       // mCursor = getContentResolver().query(ToDoProvider.CONTENT_URI, mProjection, mSelectionClause, mSelectionArgs, null);
+        newValues = new ContentValues();
+
         calendar = Calendar.getInstance();
 
         submitButton = (Button)findViewById(R.id.submitButton);
@@ -43,6 +58,16 @@ public class todoActivity extends AppCompatActivity implements DatePickerDialog.
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String titleString = title.getText().toString();
+                String descString  = description.getText().toString();
+                String date = datetime.getText().toString();
+
+                newValues.put(ToDoProvider.TODO_TABLE_COL_TITLE, titleString);
+                newValues.put(ToDoProvider.TODO_TABLE_COL_DESCRIPTION, descString);
+                newValues.put(ToDoProvider.TODO_TABLE_COL_DATE, date);
+
+                Uri newUri = getContentResolver().insert(ToDoProvider.CONTENT_URI, newValues);
+
                 finish();
             }
         });
