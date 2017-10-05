@@ -25,7 +25,12 @@
             android:name=".ToDoProvider"
             android:authorities="edu.uark.csce.assignment2.todoprovider"
             android:enabled="true"
-            android:exported="true"></provider>
+            android:exported="true" />
+
+        <receiver
+            android:name=".NotificationPublisher"
+            android:enabled="true"
+            android:exported="true"></receiver>
     </application>
 
 </manifest>

@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay">
 
+
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
@@ -31,3 +32,4 @@
         app:srcCompat="@drawable/ic_add_white_24dp" />
 
 </android.support.design.widget.CoordinatorLayout>
+

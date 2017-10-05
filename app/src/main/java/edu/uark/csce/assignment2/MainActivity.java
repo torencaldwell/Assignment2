@@ -1,6 +1,9 @@
 package edu.uark.csce.assignment2;
 
 import android.app.ListActivity;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.database.Cursor;
@@ -8,6 +11,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -33,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        listView = (ListView)findViewById(R.id.itemsList);  //TODO: change to recylerview
+        listView = (ListView)findViewById(R.id.itemsList);
 
         FloatingActionButton add_fab = (FloatingActionButton) findViewById(R.id.fab);
         add_fab.setOnClickListener(new View.OnClickListener() {
@@ -126,4 +130,5 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }
