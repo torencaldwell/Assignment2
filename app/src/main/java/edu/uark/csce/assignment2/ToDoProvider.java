@@ -32,6 +32,7 @@ public class ToDoProvider extends ContentProvider {
     public static final String TODO_TABLE_COL_TITLE = "TITLE";
     public static final String TODO_TABLE_COL_DESCRIPTION = "DESCRIPTION";
     public static final String TODO_TABLE_COL_DATE = "DATE";
+    public static final String TODO_TABLE_COL_DONE = "DONE";
     //Table create string based on column names
     private static final String SQL_CREATE_MAIN = "CREATE TABLE " +
             TABLE_NAME+ " " +                       // Table's name
@@ -39,7 +40,8 @@ public class ToDoProvider extends ContentProvider {
             TODO_TABLE_COL_ID + " INTEGER PRIMARY KEY, " +
             TODO_TABLE_COL_TITLE + " TEXT," +
             TODO_TABLE_COL_DESCRIPTION + " TEXT," +
-            TODO_TABLE_COL_DATE + " TEXT)";
+            TODO_TABLE_COL_DATE + " TEXT," +
+            TODO_TABLE_COL_DONE + " INT)";
 
     //URI Matcher object to facilitate switch cases between URIs
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);

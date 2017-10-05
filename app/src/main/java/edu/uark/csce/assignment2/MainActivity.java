@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -32,16 +33,29 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        listView = (ListView)findViewById(R.id.itemsList);
+        listView = (ListView)findViewById(R.id.itemsList);  //TODO: change to recylerview
 
         FloatingActionButton add_fab = (FloatingActionButton) findViewById(R.id.fab);
         add_fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), todoActivity.class);
+                intent.putExtra("index", -1);
                 startActivity(intent);
             }
         });
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //pass list object into todoActivity so data can be shown and updated
+                Intent intent = new Intent(getApplicationContext(), todoActivity.class);
+                intent.putExtra("index", position);
+
+                startActivity(intent);
+            }
+        });
+
         queryList();
         refreshList();
     }
@@ -51,16 +65,22 @@ public class MainActivity extends AppCompatActivity {
         String mSelectionClause = null;
         String[] mSelectionArgs = {""};
 
-        mCursor = getContentResolver().query(ToDoProvider.CONTENT_URI, mProjection, null, null, null);
+        mCursor = getContentResolver().query(ToDoProvider.CONTENT_URI, null, null, null, null);
     }
 
     public void refreshList(){
-        int index = mCursor.getColumnIndex(ToDoProvider.TODO_TABLE_COL_TITLE);
         ArrayList<String> listItems = new ArrayList<>();
 
         if(mCursor != null){
             while(mCursor.moveToNext()){
+                int index = mCursor.getColumnIndex(ToDoProvider.TODO_TABLE_COL_TITLE);
                 String item = mCursor.getString(index);
+
+                index = mCursor.getColumnIndex(ToDoProvider.TODO_TABLE_COL_DONE);
+                int done = mCursor.getInt(index);
+                if(done == 1)
+                    item += " (Done)";
+
                 listItems.add(item);
             }
         }else{

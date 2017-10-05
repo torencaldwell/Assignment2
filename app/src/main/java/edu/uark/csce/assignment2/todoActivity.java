@@ -18,16 +18,21 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
 public class todoActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener{
     Button submitButton;
     int year,month,day,hour,minute;
+    int ID;
     Calendar calendar;
 
-    TextView datetime, title, description;
+    EditText title, description;
+    TextView datetime;
     CheckBox checkBox;
+
+    boolean edit = false;
 
     Cursor mCursor;
 
@@ -50,10 +55,18 @@ public class todoActivity extends AppCompatActivity implements DatePickerDialog.
         submitButton = (Button)findViewById(R.id.submitButton);
 
         datetime = (TextView)findViewById(R.id.datetime);
-        title = (TextView)findViewById(R.id.todoTitle);
-        description = (TextView)findViewById(R.id.todoDescription);
+        title = (EditText)findViewById(R.id.todoTitle);
+        description = (EditText)findViewById(R.id.todoDescription);
 
         checkBox = (CheckBox)findViewById(R.id.doneBox);
+
+        Bundle bundle = getIntent().getExtras();
+
+        int itemIndex = bundle.getInt("index");
+        if(itemIndex != -1) {
+            queryList(itemIndex);
+            edit = true;
+        }
 
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,13 +74,27 @@ public class todoActivity extends AppCompatActivity implements DatePickerDialog.
                 String titleString = title.getText().toString();
                 String descString  = description.getText().toString();
                 String date = datetime.getText().toString();
+                int done;
+                if(checkBox.isChecked())
+                    done = 1;
+                else
+                    done = 0;
 
                 newValues.put(ToDoProvider.TODO_TABLE_COL_TITLE, titleString);
                 newValues.put(ToDoProvider.TODO_TABLE_COL_DESCRIPTION, descString);
                 newValues.put(ToDoProvider.TODO_TABLE_COL_DATE, date);
+                newValues.put(ToDoProvider.TODO_TABLE_COL_DONE, done);
 
-                Uri newUri = getContentResolver().insert(ToDoProvider.CONTENT_URI, newValues);
+                if(!edit) {
+                    Uri newUri = getContentResolver().insert(ToDoProvider.CONTENT_URI, newValues);
+                }else{
+                    String mSelectionClause = ToDoProvider.TODO_TABLE_COL_ID + " = ?";
+                    String[] mSelectionArgs = {Integer.toString(ID)};
 
+                    //newValues.putNull(ToDoProvider.TODO_TABLE_COL_ID);
+
+                    int mRowsUpdated = getContentResolver().update(ToDoProvider.CONTENT_URI, newValues, mSelectionClause, mSelectionArgs);
+                }
                 finish();
             }
         });
@@ -79,6 +106,38 @@ public class todoActivity extends AppCompatActivity implements DatePickerDialog.
                 dateFragment.show(getFragmentManager(), "datePicker");
             }
         });
+    }
+
+    public void queryList(int index){
+
+        mCursor = getContentResolver().query(ToDoProvider.CONTENT_URI, null, null, null, null);
+
+        if(mCursor != null){
+            mCursor.moveToPosition(index);
+
+            int column = mCursor.getColumnIndex(ToDoProvider.TODO_TABLE_COL_TITLE);
+            title.setText(mCursor.getString(column));
+
+            column = mCursor.getColumnIndex(ToDoProvider.TODO_TABLE_COL_DESCRIPTION);
+            description.setText(mCursor.getString(column));
+
+            column = mCursor.getColumnIndex(ToDoProvider.TODO_TABLE_COL_DATE);
+            datetime.setText(mCursor.getString(column));
+
+            column = mCursor.getColumnIndex(ToDoProvider.TODO_TABLE_COL_ID);
+            ID = mCursor.getInt(column);
+
+            column = mCursor.getColumnIndex(ToDoProvider.TODO_TABLE_COL_DONE);
+            int done = mCursor.getInt(column);
+
+            if(done == 1)
+                checkBox.setChecked(true);
+            else
+                checkBox.setChecked(false);
+        }
+
+
+
     }
 
     public void onDateSet(DatePicker view, int _year, int _month, int _day){
