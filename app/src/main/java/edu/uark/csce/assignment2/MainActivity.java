@@ -3,10 +3,13 @@ package edu.uark.csce.assignment2;
 import android.app.ListActivity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -37,8 +40,15 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //Starts the broadcast reciever to listen for network changes
+        BroadcastReceiver networkReceiver = new NetworkReceiver();
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        this.registerReceiver(networkReceiver, filter);
+
+        //Items are stored in a listview
         listView = (ListView)findViewById(R.id.itemsList);
 
+        //Floating Action Button is used to add items to the list
         FloatingActionButton add_fab = (FloatingActionButton) findViewById(R.id.fab);
         add_fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -49,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //OnClickListener for each menu item
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -64,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
         refreshList();
     }
 
+    //Queries the SQLite database
     public void queryList(){
         String[] mProjection = {ToDoProvider.TODO_TABLE_COL_TITLE, ToDoProvider.TODO_TABLE_COL_DESCRIPTION, ToDoProvider.TODO_TABLE_COL_DATE, ToDoProvider.TODO_TABLE_COL_ID};
         String mSelectionClause = null;
@@ -72,17 +84,21 @@ public class MainActivity extends AppCompatActivity {
         mCursor = getContentResolver().query(ToDoProvider.CONTENT_URI, null, null, null, null);
     }
 
+    //Populates listView with items from SQLite DB
     public void refreshList(){
         ArrayList<String> listItems = new ArrayList<>();
 
         if(mCursor != null){
             while(mCursor.moveToNext()){
+                //Get title field
                 int index = mCursor.getColumnIndex(ToDoProvider.TODO_TABLE_COL_TITLE);
                 String item = mCursor.getString(index);
 
+                //Get Done field
                 index = mCursor.getColumnIndex(ToDoProvider.TODO_TABLE_COL_DONE);
                 int done = mCursor.getInt(index);
 
+                //If item is marked as done, note it accordingly
                 if(done == 1)
                     item += " (Done)";
 
@@ -92,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
             Log.i("Query", "Error: mCursor is null");
         }
 
+        //ArrayAdapter that is used to put items into the ListView
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.list_item, listItems);
         listView.setAdapter(adapter);
     }
@@ -99,37 +116,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause(){
         super.onPause();
-        Log.i("MainActivity", "Activity Paused");
     }
 
     @Override
     protected void onResume(){
         super.onResume();
-        Log.i("MainActivity", "Activity is Resuming...");
+
+        //Refresh the list every time the activity resumes
         queryList();
         refreshList();
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
 }

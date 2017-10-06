@@ -56,10 +56,6 @@ public class todoActivity extends AppCompatActivity implements DatePickerDialog.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_todo);
 
-        String[] mProjection = {ToDoProvider.TODO_TABLE_COL_TITLE, ToDoProvider.TODO_TABLE_COL_DESCRIPTION, ToDoProvider.TODO_TABLE_COL_DATE};
-        String mSelectionClause = null;
-        String[] mSelectionArgs = {""};
-
         newValues = new ContentValues();
 
         calendar = Calendar.getInstance();
@@ -74,46 +70,53 @@ public class todoActivity extends AppCompatActivity implements DatePickerDialog.
 
         bundle = getIntent().getExtras();
 
+        //Passed in from main activity. Contains index if editing an item,
+            //contains -1 if item is new
         itemIndex = bundle.getInt("index");
         if(itemIndex != -1) {
             queryList(itemIndex);
             edit = true;
         }
 
+        //OnClickListener for the save button
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 String titleString = title.getText().toString();
                 String descString  = description.getText().toString();
                 String date = datetime.getText().toString();
                 int done;
+
                 if(checkBox.isChecked())
                     done = 1;
                 else
                     done = 0;
 
+                //Gathers data from view to insert into SQLite DB
                 newValues.put(ToDoProvider.TODO_TABLE_COL_TITLE, titleString);
                 newValues.put(ToDoProvider.TODO_TABLE_COL_DESCRIPTION, descString);
                 newValues.put(ToDoProvider.TODO_TABLE_COL_DATE, date);
                 newValues.put(ToDoProvider.TODO_TABLE_COL_DONE, done);
 
+                //If item is new, use insert(), otherwise, use update()
                 if(!edit) {
                     getContentResolver().insert(ToDoProvider.CONTENT_URI, newValues);
+                    queryList(date);    //Get items SQL ID to use as alarm ID
                 }else{
-                    cancelNotification(getBaseContext(), ID);
+                    cancelNotification(getBaseContext(), ID);   //Cancel previous alarm
                     String mSelectionClause = ToDoProvider.TODO_TABLE_COL_ID + " = ?";
                     String[] mSelectionArgs = {Integer.toString(ID)};
 
                     getContentResolver().update(ToDoProvider.CONTENT_URI, newValues, mSelectionClause, mSelectionArgs);
                 }
 
-                queryList(datetime.getText().toString());
                 scheduleNotification(getBaseContext(), calendar.getTimeInMillis(), ID);
-
                 finish();
             }
         });
 
+        //OnClickListener for date text field: opens a date/time picker
         datetime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view){
@@ -130,6 +133,7 @@ public class todoActivity extends AppCompatActivity implements DatePickerDialog.
         return true;
     }
 
+    //Listener for delete button in action bar
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         switch(item.getItemId()){
@@ -144,6 +148,7 @@ public class todoActivity extends AppCompatActivity implements DatePickerDialog.
         }
     }
 
+    //Queries list for item based on list index
     public void queryList(int index){
 
         mCursor = getContentResolver().query(ToDoProvider.CONTENT_URI, null, null, null, null);
@@ -171,14 +176,12 @@ public class todoActivity extends AppCompatActivity implements DatePickerDialog.
             else
                 checkBox.setChecked(false);
         }
-
-
-
     }
 
+    //Query list based on alarm date
     public void queryList(String date){
 
-        String mSelectionClause = ToDoProvider.TODO_TABLE_COL_DATE;
+        String mSelectionClause = ToDoProvider.TODO_TABLE_COL_DATE + " = ?";
         String[] mProjection = {ToDoProvider.TODO_TABLE_COL_TITLE, ToDoProvider.TODO_TABLE_COL_DATE, ToDoProvider.TODO_TABLE_COL_ID};
         String[] mSelectionArguments = {date};
 
@@ -186,15 +189,20 @@ public class todoActivity extends AppCompatActivity implements DatePickerDialog.
 
         mCursor = getContentResolver().query(ToDoProvider.CONTENT_URI, mProjection, mSelectionClause, mSelectionArguments, null);
 
-        /*if(mCursor != null){
+        if(mCursor != null){
+            mCursor.moveToNext();
+
             int column = mCursor.getColumnIndex(ToDoProvider.TODO_TABLE_COL_DATE);
             datetime.setText(mCursor.getString(column));
 
             column = mCursor.getColumnIndex(ToDoProvider.TODO_TABLE_COL_ID);
             ID = mCursor.getInt(column);
-        }*/
+
+            Log.i("ID", Integer.toString(ID));
+        }
     }
 
+    //Open time picker when alarm date has been set
     public void onDateSet(DatePicker view, int _year, int _month, int _day){
         DialogFragment timeFragment = new TimePickerFragment();
         timeFragment.show(getFragmentManager(), "timePicker");
@@ -204,6 +212,7 @@ public class todoActivity extends AppCompatActivity implements DatePickerDialog.
         day = _day;
     }
 
+    //Set alarm date/time when alarm time has been set
     public void onTimeSet(TimePicker view, int _hour, int _minute){
         hour = _hour;
         minute = _minute;
@@ -220,6 +229,7 @@ public class todoActivity extends AppCompatActivity implements DatePickerDialog.
         finish();
     }
 
+    //Schedules the notification to be fired at the alarm time
     public void scheduleNotification(Context context, long alarmTime, int notificationId){
         long[] vibrationPattern = {500,250,1000};
 
@@ -256,10 +266,11 @@ public class todoActivity extends AppCompatActivity implements DatePickerDialog.
         String dateString = date.toString();
 
         Log.i("Set Alarm", dateString);
-        Log.i("Alarm ID", Integer.toString(itemIndex));
+        Log.i("Alarm ID", Integer.toString(notificationId));
 
     }
 
+    //Cancels a notification alarm
     public void cancelNotification(Context context, int notificationId){
         Intent notificationIntent = new Intent(getBaseContext(), NotificationPublisher.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(getBaseContext(), notificationId, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);

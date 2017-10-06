@@ -13,7 +13,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 public class ToDoProvider extends ContentProvider {
-    int SLEEP_TIME = 10;  //3 seconds to load (what is this, Dial-up?)
+    int SLEEP_TIME = 500;  //3 seconds to load (what is this, Dial-up?)
 
     //LOGTAG set to CLass Name
     private static String LOGTAG = "ToDoProvider:";
@@ -160,8 +160,7 @@ public class ToDoProvider extends ContentProvider {
                 break;
             default:
                 Log.e(LOGTAG, "URI not recognized " + uri);
-        }
-        //Query the database based on the columns to be returned, the selection criteria and
+        }        //Query the database based on the columns to be returned, the selection criteria and
         // arguments, and the sort order
         Cursor cursor = queryBuilder.query(mOpenHelper.getWritableDatabase(),projection,selection,
                 selectionArgs,null,null,sortOrder);

@@ -22,6 +22,5 @@ public class NotificationPublisher extends BroadcastReceiver {
         notificationManager.notify(notificationId, notification);
 
         Log.i("NotificationPublisher", "Recieved notification data");
-
     }
 }
