@@ -41,7 +41,7 @@ public class ToDoProvider extends ContentProvider {
             TODO_TABLE_COL_TITLE + " TEXT," +
             TODO_TABLE_COL_DESCRIPTION + " TEXT," +
             TODO_TABLE_COL_DATE + " TEXT," +
-            TODO_TABLE_COL_DONE + " INT,";
+            TODO_TABLE_COL_DONE + " INT)";
 
     //URI Matcher object to facilitate switch cases between URIs
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);

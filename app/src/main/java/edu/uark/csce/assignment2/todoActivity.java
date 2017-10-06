@@ -100,13 +100,15 @@ public class todoActivity extends AppCompatActivity implements DatePickerDialog.
                 if(!edit) {
                     getContentResolver().insert(ToDoProvider.CONTENT_URI, newValues);
                 }else{
-                    cancelNotification(getBaseContext(), 0);
+                    cancelNotification(getBaseContext(), ID);
                     String mSelectionClause = ToDoProvider.TODO_TABLE_COL_ID + " = ?";
                     String[] mSelectionArgs = {Integer.toString(ID)};
 
                     getContentResolver().update(ToDoProvider.CONTENT_URI, newValues, mSelectionClause, mSelectionArgs);
                 }
-                scheduleNotification(getBaseContext(), calendar.getTimeInMillis(), 0);
+
+                queryList(datetime.getText().toString());
+                scheduleNotification(getBaseContext(), calendar.getTimeInMillis(), ID);
 
                 finish();
             }
@@ -132,7 +134,7 @@ public class todoActivity extends AppCompatActivity implements DatePickerDialog.
     public boolean onOptionsItemSelected(MenuItem item){
         switch(item.getItemId()){
             case R.id.action_delete:
-                cancelNotification(getBaseContext(), 0);
+                cancelNotification(getBaseContext(), ID);
                 Uri uri_id = Uri.withAppendedPath(ToDoProvider.CONTENT_URI, Integer.toString(ID));
                 getContentResolver().delete(uri_id, null, null);
                 finish();
@@ -172,6 +174,25 @@ public class todoActivity extends AppCompatActivity implements DatePickerDialog.
 
 
 
+    }
+
+    public void queryList(String date){
+
+        String mSelectionClause = ToDoProvider.TODO_TABLE_COL_DATE;
+        String[] mProjection = {ToDoProvider.TODO_TABLE_COL_TITLE, ToDoProvider.TODO_TABLE_COL_DATE, ToDoProvider.TODO_TABLE_COL_ID};
+        String[] mSelectionArguments = {date};
+
+        Log.i("Searching List For", date);
+
+        mCursor = getContentResolver().query(ToDoProvider.CONTENT_URI, mProjection, mSelectionClause, mSelectionArguments, null);
+
+        /*if(mCursor != null){
+            int column = mCursor.getColumnIndex(ToDoProvider.TODO_TABLE_COL_DATE);
+            datetime.setText(mCursor.getString(column));
+
+            column = mCursor.getColumnIndex(ToDoProvider.TODO_TABLE_COL_ID);
+            ID = mCursor.getInt(column);
+        }*/
     }
 
     public void onDateSet(DatePicker view, int _year, int _month, int _day){
@@ -246,7 +267,7 @@ public class todoActivity extends AppCompatActivity implements DatePickerDialog.
         AlarmManager am = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         am.cancel(pendingIntent);
 
-        Log.i("Alarm Cancelled", Integer.toString(itemIndex));
+        Log.i("Alarm Cancelled", Integer.toString(ID));
     }
 
 
