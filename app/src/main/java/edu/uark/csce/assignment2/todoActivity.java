@@ -36,7 +36,7 @@ import java.util.Date;
 public class todoActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener{
     Button submitButton;
     int year,month,day,hour,minute;
-    int ID;
+    int ID, itemIndex;
     Calendar calendar;
 
     EditText title, description;
@@ -74,7 +74,7 @@ public class todoActivity extends AppCompatActivity implements DatePickerDialog.
 
         bundle = getIntent().getExtras();
 
-        int itemIndex = bundle.getInt("index");
+        itemIndex = bundle.getInt("index");
         if(itemIndex != -1) {
             queryList(itemIndex);
             edit = true;
@@ -100,13 +100,14 @@ public class todoActivity extends AppCompatActivity implements DatePickerDialog.
                 if(!edit) {
                     getContentResolver().insert(ToDoProvider.CONTENT_URI, newValues);
                 }else{
-                    cancelNotification(getApplicationContext(), ID);
+                    cancelNotification(getBaseContext(), 0);
                     String mSelectionClause = ToDoProvider.TODO_TABLE_COL_ID + " = ?";
                     String[] mSelectionArgs = {Integer.toString(ID)};
 
                     getContentResolver().update(ToDoProvider.CONTENT_URI, newValues, mSelectionClause, mSelectionArgs);
                 }
-                scheduleNotification(getApplicationContext(), timeToMillis(calendar), ID);
+                scheduleNotification(getBaseContext(), calendar.getTimeInMillis(), 0);
+
                 finish();
             }
         });
@@ -131,7 +132,7 @@ public class todoActivity extends AppCompatActivity implements DatePickerDialog.
     public boolean onOptionsItemSelected(MenuItem item){
         switch(item.getItemId()){
             case R.id.action_delete:
-                cancelNotification(getApplicationContext(), ID);
+                cancelNotification(getBaseContext(), 0);
                 Uri uri_id = Uri.withAppendedPath(ToDoProvider.CONTENT_URI, Integer.toString(ID));
                 getContentResolver().delete(uri_id, null, null);
                 finish();
@@ -187,7 +188,7 @@ public class todoActivity extends AppCompatActivity implements DatePickerDialog.
         minute = _minute;
 
         SimpleDateFormat sdf = new SimpleDateFormat("EE d MMM yyyy h:mm a");
-        calendar.set(year, month, day, hour, minute);
+        calendar.set(year, month, day, hour, minute, 0);
         datetime.setText(sdf.format(calendar.getTime()));
 
     }
@@ -198,53 +199,57 @@ public class todoActivity extends AppCompatActivity implements DatePickerDialog.
         finish();
     }
 
-    public void scheduleNotification(Context context, long delay, int notificationId){
+    public void scheduleNotification(Context context, long alarmTime, int notificationId){
         long[] vibrationPattern = {500,250,1000};
 
+        //Builds the notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
                 .setContentTitle("Todo")
                 .setContentText(title.getText())
                 .setSmallIcon(R.drawable.ic_timelapse_white_24dp)
                 .setVibrate(vibrationPattern);
 
-        Intent intent = new Intent(context, todoActivity.class);
-        intent.putExtra("index", bundle.getInt("index"));
+        //Intent that is fired when the notification is clicked
+        Intent activity = new Intent(getBaseContext(), todoActivity.class);
+        activity.putExtra("index", bundle.getInt("index"));
 
-        PendingIntent activity = PendingIntent.getActivity(context, notificationId, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-        builder.setContentIntent(activity);
+        //A pending intent for the activity intent above
+        PendingIntent pendActivity = PendingIntent.getActivity(getBaseContext(), notificationId, activity, PendingIntent.FLAG_CANCEL_CURRENT);
+        builder.setContentIntent(pendActivity);
 
         Notification notification = builder.build();
 
-        Intent notificationIntent = new Intent(context, NotificationPublisher.class);
+        //Creates an intent that calls the alarm broadcast receiver
+        Intent notificationIntent = new Intent(getBaseContext(), NotificationPublisher.class);
         notificationIntent.putExtra(NotificationPublisher.NOTIFICATION_ID, notificationId);
         notificationIntent.putExtra(NotificationPublisher.NOTIFICATION, notification);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, notificationId, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-        long futureInMillis = delay;
+        //A pending intent for the alarm broadcast receiver
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getBaseContext(), notificationId, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        //Sets the alarm which calls the broadcast receiver intent
         AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, futureInMillis, pendingIntent);
+        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, alarmTime, pendingIntent);
 
-        Date date = new Date(futureInMillis);
+        Date date = new Date(alarmTime);
         String dateString = date.toString();
 
-        Log.i("Notification Date", dateString);
+        Log.i("Set Alarm", dateString);
+        Log.i("Alarm ID", Integer.toString(itemIndex));
 
     }
 
     public void cancelNotification(Context context, int notificationId){
-        Intent intent = new Intent(this, NotificationPublisher.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, notificationId, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        Intent notificationIntent = new Intent(getBaseContext(), NotificationPublisher.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getBaseContext(), notificationId, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         AlarmManager am = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-
         am.cancel(pendingIntent);
-        pendingIntent.cancel();
+
+        Log.i("Alarm Cancelled", Integer.toString(itemIndex));
     }
 
-    public long timeToMillis(Calendar c){
-        long calendarTime = c.getTimeInMillis();
-        return calendarTime;//-currentTime;
-    }
+
 
 }
 

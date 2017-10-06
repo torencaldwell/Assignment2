@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void queryList(){
-        String[] mProjection = {ToDoProvider.TODO_TABLE_COL_TITLE, ToDoProvider.TODO_TABLE_COL_DESCRIPTION, ToDoProvider.TODO_TABLE_COL_DATE};
+        String[] mProjection = {ToDoProvider.TODO_TABLE_COL_TITLE, ToDoProvider.TODO_TABLE_COL_DESCRIPTION, ToDoProvider.TODO_TABLE_COL_DATE, ToDoProvider.TODO_TABLE_COL_ID};
         String mSelectionClause = null;
         String[] mSelectionArgs = {""};
 
@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
 
                 index = mCursor.getColumnIndex(ToDoProvider.TODO_TABLE_COL_DONE);
                 int done = mCursor.getInt(index);
+
                 if(done == 1)
                     item += " (Done)";
 

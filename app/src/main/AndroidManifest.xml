@@ -9,6 +9,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <uses-permission android:name="com.android.permission.SET_ALARM"/>
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -28,6 +31,7 @@
             android:exported="true" />
 
         <receiver
+            android:process=":remote"
             android:name=".NotificationPublisher"
             android:enabled="true"
             android:exported="true"></receiver>
